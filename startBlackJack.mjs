@@ -6,45 +6,63 @@ import { stdin as input, stdout as output } from 'node:process'; // Импорт
 
 
 //Неизменяемые переменные
-const giveOneCard = 1
-const giveTwoCards = 2
-const bjScore = 21
+const CMD_GIVE_ONE_CARD = 1
+const CMD_GIVE_TWO_CARDS = 2
+const CMD_BJ_SCORE = 21
+const CMD_HAND_PLAYER_SCORE_TO_ADD_CARD = 17
+const CMD_HAND_DEALER_SCORE_TO_ADD_CARD = 17
 
 // Сообщения
+// ASK MESSAGES
 
+const ASK_BALANCR = 'How much your balance will be? (Enter integer number) \n'
+const ASK_YOUR_BET = 'What is your BET? ( Enter a integer number) \n'
+const ASK_ONE_MORE_CARD = "Are you need one more card? (Print 'yes' if you need one more card, 'No' Dealer turn) \n"
+const ASK_FINISH_ROUND = 'Do you want play new round?(print "yes" for new round, "no" to finish) \n'
+const ASK_FINISH_GAME = 'Finish game?(print "yes" to quite the game) \n'
 
-const balanceAsk = 'How much your balance will be? (Enter integer number) \n'
-const yourBalanceNow = 'Your balance now is:'
-const betAsk = 'What is your BET? ( Enter a integer number) \n'
-const oneMoreCardAsk = "Are you need one more card? (Print 'yes' if you need one more card, 'No' Dealer turn) \n"
-const finishRoundAsk = 'Do you want play new round?(print "yes" for new round, "no" to finish) \n'
-const finishGameAsk = 'Finish game?(print "yes" to quite the game) \n'
-const playerBjMessage = 'Congratulation! You have BLACKJACK! You are WON!'
-const dealerBjMessage = 'Sorry Dealer have BLACKJACK! You lose your bet'
-const playerLoseMessage = 'Sorry, you are lose your bet!'
-const dealerOverScoreMessage = 'You are won. Dealer have OVERSCORE!'
-const congratsMessage = 'You are WINNER!'
-const loseMessage = 'You are lose!'
-const drawMessage = "Oops! It's a DRAW! Try again!"
-const bothHands = "Both hands defined"
-const playerHandMessage = "Final player hand is:"
-const dealerHandMessage = "Final dealer hand is:"
-const stars = "***********************************************"
-const siYa = "See you next time! Good luck!"
+//INFO MESSAGES
+const INFO_YOUR_BALANCE = 'Your balance now is:'
+const INFO_PLAYER_BJ = 'Congratulation! You have BLACKJACK! You are WON!'
+const INFO_DEALER_BJ = 'Sorry Dealer have BLACKJACK! You lose your bet'
+const INFO_PLAYER_LOSE_BET = 'Sorry, you are lose your bet!'
+const INFO_DEALER_OVER_SCRORE = 'You are won. Dealer have OVERSCORE!'
+const INFO_PLAYER_WIN = 'You are WINNER!'
+const INFO_PLAYERS_LOSE = 'You are lose!'
+const INFO_DRAW = "Oops! It's a DRAW! Try again!"
+const INFO_BOTH_HANDS = "Both hands defined"
+const INFO_PLAYER_HAND = "Final player hand is:"
+const INFO_DEALER_HAND = "Final dealer hand is:"
+const INFO_SEE_YOU = "See you next time! Good luck!"
+
+//COMAN MESSAGES
+const CMD_STARS = "***********************************************"
 
 
 // Изменяемые переменные
-let handScoreWithAces = 0
-let playerHandScore = 0
-let dealerHandScore = 0
-let roundstart
-let gamestart
-let playerBalance = 0
-let playerBet = 0
-let answerCard
-let playerHand =[]
-let dealerHand =[]
-let start = true
+
+class MutableVariables {
+    constructor () {      
+        this.value = 0
+        this.undefined = undefined
+        this.array = []
+        this.booleantrue = true
+    }
+
+}
+
+
+let handScoreWithAces = new MutableVariables().value
+let playerHandScore = new MutableVariables().value
+let dealerHandScore = new MutableVariables().value
+let roundstart = new MutableVariables().undefined
+let gamestart = new MutableVariables().undefined
+let playerBalance = new MutableVariables().value
+let playerBet = new MutableVariables().value
+let answerCard = new MutableVariables().undefined
+let playerHand =new MutableVariables().array
+let dealerHand =new MutableVariables().array
+let start = new MutableVariables().booleantrue
 
 
 
@@ -72,7 +90,7 @@ function resetDealerHand(dealerHand) {
 
 //есть ли БЛЭКДЖЕК
 function blackjackCheck(hand, value){
-    if (hand.length === 2 && value === bjScore)
+    if (hand.length === 2 && value === CMD_BJ_SCORE)
     return true
 }
 //Проверка на перебор и Тузов у Игрока
@@ -82,7 +100,7 @@ function blackjackCheck(hand, value){
 
 //Проверка на перебор и Тузов у Дилера
 function acesDealerOverScore(dealerHandScore, dealerHand){
-    if (dealerHandScore > bjScore) {
+    if (dealerHandScore > CMD_BJ_SCORE) {
         dealerHand.forEach(element => {if (element in deck) {
        
             if (deck[element] === undefined) {
@@ -104,23 +122,23 @@ function acesDealerOverScore(dealerHandScore, dealerHand){
 
 //проверка на перебор 
 function overScore(value){
-    if (value > bjScore)
+    if (value > CMD_BJ_SCORE)
     return true
 }
 
 //Проверка кто выиграл в рануде
 function winnerCheck (playerScore, dealerScore){
     if (playerScore > dealerScore) {
-        console.log (congratsMessage)
+        console.log (INFO_PLAYER_WIN)
         playerBalance = playerBalance + (2 * playerBet)
         return
     }
     if (playerScore < dealerScore) {
-        console.log(loseMessage)
+        console.log(INFO_PLAYERS_LOSE)
         return
     }
     else {
-        console.log(drawMessage)
+        console.log(INFO_DRAW)
         playerBalance =playerBalance + playerBet
         return
     }
@@ -141,10 +159,10 @@ while (start !== 'yes') {
     // Проверка баланса для начала - если нет баланса - игрок вводи количество с которым будет играть    
     if (playerBalance === 0 ) {
     const rlBalance = readline.createInterface({ input, output });
-    const answerBalance = await rlBalance.question(`${stars} \n${balanceAsk}`);
+    const answerBalance = await rlBalance.question(`${CMD_STARS} \n${ASK_BALANCR}`);
     rlBalance.close(); 
     playerBalance =  Number(answerBalance)
-    console.log(`${stars} \n ${yourBalanceNow} ${playerBalance}`)
+    console.log(`${CMD_STARS} \n ${INFO_YOUR_BALANCE} ${playerBalance}`)
     }
     
 
@@ -153,29 +171,29 @@ while (start !== 'yes') {
 while (roundstart !== 'no') {
     if (playerBet === 0) {
         const rlBet = readline.createInterface({ input, output });
-        const answerBet = await rlBet.question(`${stars} \n ${betAsk}`);
+        const answerBet = await rlBet.question(`${CMD_STARS} \n ${ASK_YOUR_BET}`);
         rlBet.close();
         playerBet = Number(answerBet)
             playerBalance = playerBalance - playerBet
-            console.log(`${yourBalanceNow} ${playerBalance}`)
+            console.log(`${INFO_YOUR_BALANCE} ${playerBalance}`)
     }
     
     //Раздаем карты Дилеру и Игроку - ИГРОКУ 2 карты, ДИЛЕРУ 1 карту
-        playerHand = getPlayerHandForPlaying(giveTwoCards)
-        dealerHand = getDealerHandForPlaying(giveOneCard)
-        console.log(stars)
+        playerHand = getPlayerHandForPlaying(CMD_GIVE_TWO_CARDS)
+        dealerHand = getDealerHandForPlaying(CMD_GIVE_ONE_CARD)
+        console.log(CMD_STARS)
         console.log(`Player hand is ${playerHand}`)
         console.log(`Dealer hand is ${dealerHand}`)
     // Проверяем ценность рук   
         playerHandScore = handValue(playerHand)
         dealerHandScore = handValue(dealerHand)
-        console.log(stars)
+        console.log(CMD_STARS)
         console.log(`Player hand score is ${playerHandScore}`)
         console.log(`Dealer hand score is ${dealerHandScore}`)
 
     //Надо проверить на БЛЭКДЖЕК У ИГРОКА - он сразу выиграл
     if  ( blackjackCheck(playerHand, playerHandScore) == true) {
-        console.log (playerBjMessage)
+        console.log (INFO_PLAYER_BJ)
         playerBalance = playerBalance + 2,5 * playerBet
         resetPlayeerHand(playerHand)
         resetDealerHand(dealerHand)
@@ -184,17 +202,17 @@ while (roundstart !== 'no') {
     }
     
         //Определяем ценность руки и спрашиваем нужна ли еще одна картам игроку
-    if (playerHand.length === 2 && playerHandScore <= 17 ) {
+    if (playerHand.length === 2 && playerHandScore <= CMD_HAND_PLAYER_SCORE_TO_ADD_CARD ) {
         answerCard = true
         while (answerCard !== 'no') {
             const rlCardAsk = readline.createInterface({ input, output });
-            const answerCard = await rlCardAsk.question(`${stars} \n${oneMoreCardAsk}`);
+            const answerCard = await rlCardAsk.question(`${CMD_STARS} \n${ASK_ONE_MORE_CARD}`);
             rlCardAsk.close();
             if (answerCard === 'yes') {
-                playerHand = getPlayerHandForPlaying(giveOneCard)
+                playerHand = getPlayerHandForPlaying(CMD_GIVE_ONE_CARD)
                 playerHandScore = handValue(playerHand)
                 //Сразу проверям на перебор И ТУЗОВ    
-                if (playerHandScore > bjScore) {
+                if (playerHandScore > CMD_BJ_SCORE) {
                     playerHandScore = handValueWithAces(playerHand)
                 }
                 console.log(`Player hand after card adding is ${playerHand}`)
@@ -205,7 +223,7 @@ while (roundstart !== 'no') {
                 }               
             //Сразу проверям на перебор
             if (overScore(playerHandScore) == true) {
-                    console.log (playerLoseMessage)
+                    console.log (INFO_PLAYER_LOSE_BET)
                     break         
             } 
             
@@ -220,14 +238,14 @@ while (roundstart !== 'no') {
     //Игрок закончил добирать карты
 
         //Выдает Идлеру 2ю карту и находbn ценность его руки
-        dealerHand = getDealerHandForPlaying(giveOneCard)
-        dealerHandScore = handValue(dealerHand)
-        console.log(stars)
-        console.log(`Dealer hand with 2 cards is ${dealerHand}`)
-        console.log(`Dealer hand score with 2 cardsis ${dealerHandScore}`)
+    dealerHand = getDealerHandForPlaying(CMD_GIVE_ONE_CARD)
+    dealerHandScore = handValue(dealerHand)
+    console.log(CMD_STARS)
+    console.log(`Dealer hand with 2 cards is ${dealerHand}`)
+    console.log(`Dealer hand score with 2 cardsis ${dealerHandScore}`)
         //Проверяем на БЛЭКДЖЕК У ДИЛЕРА
         if  ( blackjackCheck(dealerHand, dealerHandScore) == true) {
-            console.log (dealerBjMessage)
+            console.log (INFO_DEALER_BJ)
             resetPlayeerHand(playerHand)
             resetDealerHand(dealerHand)
             setSettingsToDefault()
@@ -235,19 +253,19 @@ while (roundstart !== 'no') {
         }
 
         //Смотрим на ценность руки Дилера и если она слабая - > добираем карты
-        while ( dealerHandScore <= 17 ) {
-            dealerHand = getDealerHandForPlaying(giveOneCard)
+        while ( dealerHandScore <= CMD_HAND_DEALER_SCORE_TO_ADD_CARD ) {
+            dealerHand = getDealerHandForPlaying(CMD_GIVE_ONE_CARD)
             dealerHandScore = handValue(dealerHand)
-            console.log(stars)
+            console.log(CMD_STARS)
             console.log(`Dealer hand after card adding is ${dealerHand}`)
             console.log(`Dealer hand score after card adding is ${dealerHandScore}`)
-            if (dealerHandScore > bjScore) {
+            if (dealerHandScore > CMD_BJ_SCORE) {
             dealerHandScore = acesDealerOverScore(dealerHandScore, dealerHand)
             }
             //Сразу проверям на перебор
             //сразу проверяем на перебор у Дилера
             if (overScore(dealerHandScore) == true) {
-                console.log(dealerOverScoreMessage)
+                console.log(INFO_DEALER_OVER_SCRORE)
                 playerBalance = playerBalance + (2 * playerBet)
             }
         }
@@ -258,11 +276,11 @@ while (roundstart !== 'no') {
             setSettingsToDefault()
             break
         }    
-        console.log(stars)
-        console.log(`${bothHands}`)
-        console.log(`${playerHandMessage} ${playerHand} and score of it: ${playerHandScore}`)
-        console.log(`${dealerHandMessage} ${dealerHand} adn score of it: ${dealerHandScore}`)
-        console.log(stars)
+        console.log(CMD_STARS)
+        console.log(`${INFO_BOTH_HANDS}`)
+        console.log(`${INFO_PLAYER_HAND} ${playerHand} and score of it: ${playerHandScore}`)
+        console.log(`${INFO_DEALER_HAND} ${dealerHand} adn score of it: ${dealerHandScore}`)
+        console.log(CMD_STARS)
         //Если не было ни у кого БЛЭКДЖЕКА и ПЕРЕБОРА проверяем кто выиграл
 
             winnerCheck(playerHandScore, dealerHandScore)
@@ -279,18 +297,18 @@ while (roundstart !== 'no') {
             console.log(`Your balance is ${playerBalance}`)
 
 const rlRound = readline.createInterface({ input, output });
-const answertwo = await rlRound.question(finishRoundAsk);
+const answertwo = await rlRound.question(ASK_FINISH_ROUND);
     rlRound.close();
     roundstart = answertwo
 
 } 
 
 const rlGame = readline.createInterface({ input, output });
-const answerGame = await rlGame.question(finishGameAsk);
+const answerGame = await rlGame.question(ASK_FINISH_GAME);
     rlGame.close();
     gamestart =  answerGame
     if (gamestart === 'yes') {
-        console.log(siYa)
+        console.log(INFO_SEE_YOU)
        break}    
 
 }
