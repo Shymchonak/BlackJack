@@ -39,6 +39,7 @@ const INFO_YOU_TRY_ENTER_EMPTY_DATA = 'Your try enter NO DATA! Please enter only
 const INFO_SEE_YOU = "See you next time! Good luck!"
 const INFO_YOUR_BET_MORE_THAN_BALANCE = "Your bet is more than your balance! Please enter another one!"
 const INFO_ENTER_NEGATIVEV_VALUE = "You try enter negative number! Please enter only positive numbers!"
+const INFO_YOU_TRY_ENTER_SPACES = "Your try enter NODATA or ONLY SPACES! Enter only numbers please!"
 //COMAN MESSAGES
 const CMD_STARS = "***********************************************"
 
@@ -54,7 +55,6 @@ class MutableVariables {
     }
 
 }
-
 
 let handScoreWithAces = new MutableVariables().value
 let playerHandScore = new MutableVariables().value
@@ -147,16 +147,19 @@ function winnerCheck (playerScore, dealerScore){
 
 //Проверки ввода
 
-function checkEnterString(balance)
-{ if (isNaN(balance) == true){
+function checkEnterString(enteredValue)
+{ if (isNaN(enteredValue) == true ){
     console.log(INFO_YOU_TRY_ENTER_STRING)
     }
 }
-function checkEnterEmptyData(qstAswr) {
-    if (Boolean(qstAswr) == false){
-    console.log(INFO_YOU_TRY_ENTER_EMPTY_DATA)
-    }
+
+function checkEnterSpaces(enteredSpace) {
+    if (enteredSpace.trim() === ''){
+        console.log(INFO_YOU_TRY_ENTER_SPACES)
+        }
 }
+
+
 function checkBetMoreThanBalance(bet,balance){
     if(bet > balance){
         console.log(INFO_YOUR_BET_MORE_THAN_BALANCE)
@@ -185,7 +188,7 @@ while (start !== 'yes') {
     const answerBalance = await rlBalance.question(`${CMD_STARS} \n${ASK_BALANCR}`);
     rlBalance.close();
     playerBalance =  Number(answerBalance)
-    checkEnterEmptyData(answerBalance)
+    checkEnterSpaces(answerBalance)
     checkEnterString(playerBalance)
     checkNegativeNumber(playerBalance)
     while (isNaN(playerBalance) == true || Boolean(answerBalance) == false || playerBalance <= 0) {
@@ -194,7 +197,7 @@ while (start !== 'yes') {
         const answerBalance = await rlBalance.question(`${CMD_STARS} \n${ASK_BALANCR}`);
         rlBalance.close();
         playerBalance = Number(answerBalance)
-        checkEnterEmptyData(answerBalance)
+        checkEnterSpaces(answerBalance)
         checkEnterString(playerBalance)
         checkNegativeNumber(playerBalance)       
         if (isNaN(playerBalance) == false && Boolean(answerBalance) == true && playerBalance !== 0 && playerBalance > 0){
@@ -212,7 +215,8 @@ while (roundstart !== 'no') {
         const answerBet = await rlBet.question(`${CMD_STARS} \n ${ASK_YOUR_BET}`);
         rlBet.close();
         playerBet = Number(answerBet)
-        checkEnterEmptyData(answerBet)
+  //      checkEnterEmptyData(answerBet)
+        checkEnterSpaces(answerBet)
         checkEnterString(playerBet)
         checkNegativeNumber(playerBet)
         checkBetMoreThanBalance(playerBet, playerBalance)
@@ -222,11 +226,11 @@ while (roundstart !== 'no') {
             const answerBet = await rlBet.question(`${CMD_STARS} \n ${ASK_YOUR_BET}`);
             rlBet.close();
             playerBet = Number(answerBet)
-            checkEnterEmptyData(answerBet)
+            checkEnterSpaces(answerBet)
             checkEnterString(playerBet)
             checkNegativeNumber(playerBet)
             checkBetMoreThanBalance(playerBet, playerBalance)       
-            if (isNaN(playerBet) == false && Boolean(answerBet) == true && playerBet !== 0 && playerBet < playerBalance && playerBet > 0){
+            if (isNaN(playerBet) == false && Boolean(answerBet) == true && playerBet !== 0 && playerBet <= playerBalance && playerBet > 0){
                 break
             }
         }   
