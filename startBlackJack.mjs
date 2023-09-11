@@ -259,6 +259,10 @@ while (roundstart !== 'no') {
         resetPlayeerHand(playerHand)
         resetDealerHand(dealerHand)
         setSettingsToDefault()
+        const rlRound = readline.createInterface({ input, output });
+        const answerRound = await rlRound.question(ASK_FINISH_ROUND);
+        rlRound.close();
+        roundstart = answerRound
         continue
     }
     
@@ -326,12 +330,13 @@ while (roundstart !== 'no') {
         while ( dealerHandScore <= CMD_HAND_DEALER_SCORE_TO_ADD_CARD ) {
             dealerHand = getDealerHandForPlaying(CMD_GIVE_ONE_CARD)
             dealerHandScore = handValue(dealerHand)
+            //Сразу проверям на перебор c ТУЗАМИ
+            if (dealerHandScore > CMD_BJ_SCORE) {
+                dealerHandScore = handValueWithAces(dealerHand)
+                }
             console.log(CMD_STARS)
             console.log(`Dealer hand after card adding is ${dealerHand}`)
             console.log(`Dealer hand score after card adding is ${dealerHandScore}`)
-            if (dealerHandScore > CMD_BJ_SCORE) {
-            dealerHandScore = handValueWithAces(dealerHand)
-            }
             //Сразу проверям на перебор
             //сразу проверяем на перебор у Дилера
             if (overScore(dealerHandScore) == true) {
