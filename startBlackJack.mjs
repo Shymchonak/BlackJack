@@ -3,9 +3,7 @@ import { getDealerHandForPlaying, getPlayerHandForPlaying, handValue, handValueW
 import {deck} from "./deckForPlaying.mjs"
 import * as readline from 'node:readline/promises';   //This uses the promise-based APIs // Импорт для ввода через консоль
 import { stdin as input, stdout as output } from 'node:process'; // Импорт для ввода через консоль
-import { isNumber } from "node:util";
-import { isNumberObject } from "node:util/types";
-import { countReset } from "node:console";
+
 
 
 //Неизменяемые переменные
@@ -13,7 +11,7 @@ const CMD_GIVE_ONE_CARD = 1
 const CMD_GIVE_TWO_CARDS = 2
 const CMD_BJ_SCORE = 21
 const CMD_HAND_PLAYER_SCORE_TO_ADD_CARD = 17
-const CMD_HAND_DEALER_SCORE_TO_ADD_CARD = 18
+const CMD_HAND_DEALER_SCORE_TO_ADD_CARD = 17
 
 // Сообщения
 // ASK MESSAGES
@@ -39,7 +37,8 @@ const INFO_DEALER_HAND = "Final dealer hand is:"
 const INFO_YOU_TRY_ENTER_STRING = 'You try enter STRING! Please enter only numbers!'
 const INFO_YOU_TRY_ENTER_EMPTY_DATA = 'Your try enter NO DATA! Please enter only numbers!'
 const INFO_SEE_YOU = "See you next time! Good luck!"
-const INFO_YOUR_BET_MORE_THAN_BALANCE = "Your bet more than your balance! Please enter another one!"
+const INFO_YOUR_BET_MORE_THAN_BALANCE = "Your bet is more than your balance! Please enter another one!"
+const INFO_ENTER_NEGATIVEV_VALUE = "You try enter negative number! Please enter only positive numbers!"
 //COMAN MESSAGES
 const CMD_STARS = "***********************************************"
 
@@ -110,8 +109,7 @@ function acesDealerOverScore(dealerHandScore, dealerHand){
        
             if (deck[element] === undefined) {
                 deck[element] = 1
-            } 
-            
+            }            
             handScoreWithAces += deck[element]
             return handScoreWithAces
         }
@@ -121,8 +119,6 @@ function acesDealerOverScore(dealerHandScore, dealerHand){
         handScoreWithAces = 0
         return finalScore
     }
-    
-    
 }
 
 //проверка на перебор 
@@ -166,6 +162,11 @@ function checkBetMoreThanBalance(bet,balance){
         console.log(INFO_YOUR_BET_MORE_THAN_BALANCE)
     }
 }
+function checkNegativeNumber(number){
+    if (number < 0){
+        console.log(INFO_ENTER_NEGATIVEV_VALUE)
+    }
+}
 // Проверяем ценность рук   
 playerHandScore = handValue(playerHand)
 
@@ -186,16 +187,17 @@ while (start !== 'yes') {
     playerBalance =  Number(answerBalance)
     checkEnterEmptyData(answerBalance)
     checkEnterString(playerBalance)
-    
-    while (isNaN(playerBalance) == true || Boolean(answerBalance) == false || playerBalance === 0) {
+    checkNegativeNumber(playerBalance)
+    while (isNaN(playerBalance) == true || Boolean(answerBalance) == false || playerBalance <= 0) {
         playerBalance = undefined
         const rlBalance = readline.createInterface({ input, output });
         const answerBalance = await rlBalance.question(`${CMD_STARS} \n${ASK_BALANCR}`);
         rlBalance.close();
         playerBalance = Number(answerBalance)
         checkEnterEmptyData(answerBalance)
-        checkEnterString(playerBalance)       
-        if (isNaN(playerBalance) == false && Boolean(answerBalance) == true && playerBalance !== 0){
+        checkEnterString(playerBalance)
+        checkNegativeNumber(playerBalance)       
+        if (isNaN(playerBalance) == false && Boolean(answerBalance) == true && playerBalance !== 0 && playerBalance > 0){
             break
         }
     }   
@@ -212,8 +214,9 @@ while (roundstart !== 'no') {
         playerBet = Number(answerBet)
         checkEnterEmptyData(answerBet)
         checkEnterString(playerBet)
+        checkNegativeNumber(playerBet)
         checkBetMoreThanBalance(playerBet, playerBalance)
-        while (isNaN(playerBet) == true || Boolean(answerBet) == false || playerBet === 0 || playerBet > playerBalance) {
+        while (isNaN(playerBet) == true || Boolean(answerBet) == false || playerBet <= 0 || playerBet > playerBalance) {
             playerBet = undefined
             const rlBet = readline.createInterface({ input, output });
             const answerBet = await rlBet.question(`${CMD_STARS} \n ${ASK_YOUR_BET}`);
@@ -221,8 +224,9 @@ while (roundstart !== 'no') {
             playerBet = Number(answerBet)
             checkEnterEmptyData(answerBet)
             checkEnterString(playerBet)
+            checkNegativeNumber(playerBet)
             checkBetMoreThanBalance(playerBet, playerBalance)       
-            if (isNaN(playerBet) == false && Boolean(answerBet) == true && playerBet !== 0 && playerBet < playerBalance){
+            if (isNaN(playerBet) == false && Boolean(answerBet) == true && playerBet !== 0 && playerBet < playerBalance && playerBet > 0){
                 break
             }
         }   
