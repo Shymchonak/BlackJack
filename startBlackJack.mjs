@@ -259,7 +259,7 @@ while (roundstart !== 'no') {
         resetPlayeerHand(playerHand)
         resetDealerHand(dealerHand)
         setSettingsToDefault()
-        break
+        continue
     }
     
         //Определяем ценность руки и спрашиваем нужна ли еще одна картам игроку
@@ -285,7 +285,11 @@ while (roundstart !== 'no') {
             //Сразу проверям на перебор
             if (overScore(playerHandScore) == true) {
                     console.log (INFO_PLAYER_LOSE_BET)
-                    break         
+                    const rlRound = readline.createInterface({ input, output });
+                    const answerRound = await rlRound.question(ASK_FINISH_ROUND);
+                    rlRound.close();
+                    roundstart = answerRound
+                    break   
             } 
             
         }
@@ -295,7 +299,7 @@ while (roundstart !== 'no') {
         resetPlayeerHand(playerHand)
         resetDealerHand(dealerHand)
         setSettingsToDefault()
-        break
+        continue
     } 
     //Игрок закончил добирать карты
 
@@ -311,7 +315,11 @@ while (roundstart !== 'no') {
             resetPlayeerHand(playerHand)
             resetDealerHand(dealerHand)
             setSettingsToDefault()
-            break
+            const rlRound = readline.createInterface({ input, output });
+            const answerRound = await rlRound.question(ASK_FINISH_ROUND);
+            rlRound.close();
+            roundstart = answerRound
+            continue 
         }
 
         //Смотрим на ценность руки Дилера и если она слабая - > добираем карты
@@ -336,7 +344,11 @@ while (roundstart !== 'no') {
             resetPlayeerHand(playerHand)
             resetDealerHand(dealerHand)
             setSettingsToDefault()
-            break
+            const rlRound = readline.createInterface({ input, output });
+            const answerRound = await rlRound.question(ASK_FINISH_ROUND);
+            rlRound.close();
+            roundstart = answerRound 
+            continue
         }    
         console.log(CMD_STARS)
         console.log(`${INFO_BOTH_HANDS}`)
@@ -345,23 +357,23 @@ while (roundstart !== 'no') {
         console.log(CMD_STARS)
         //Если не было ни у кого БЛЭКДЖЕКА и ПЕРЕБОРА проверяем кто выиграл
 
-            winnerCheck(playerHandScore, dealerHandScore)
+        winnerCheck(playerHandScore, dealerHandScore)
 
-            // Обнуление руки Игрока
-            resetPlayeerHand(playerHand)
-            //Обнулении руки Дилера
-            resetDealerHand(dealerHand) 
-            // сбрасываем все переменные
-            setSettingsToDefault()
+        // Обнуление руки Игрока
+        resetPlayeerHand(playerHand)
+        //Обнулении руки Дилера
+        resetDealerHand(dealerHand) 
+        // сбрасываем все переменные
+        setSettingsToDefault()
             
-            //выводим баланс Игрока ПОСЛЕ раунда
+        //выводим баланс Игрока ПОСЛЕ раунда
 
-            console.log(`Your balance is ${playerBalance}`)
+        console.log(`Your balance is ${playerBalance}`)
 
 const rlRound = readline.createInterface({ input, output });
-const answertwo = await rlRound.question(ASK_FINISH_ROUND);
+const answerRound = await rlRound.question(ASK_FINISH_ROUND);
     rlRound.close();
-    roundstart = answertwo
+    roundstart = answerRound
 
 } 
 
