@@ -10,7 +10,7 @@ const CMD_GIVE_ONE_CARD = 1
 const CMD_GIVE_TWO_CARDS = 2
 const CMD_BJ_SCORE = 21
 const CMD_HAND_PLAYER_SCORE_TO_ADD_CARD = 17
-const CMD_HAND_DEALER_SCORE_TO_ADD_CARD = 17
+const CMD_HAND_DEALER_SCORE_TO_ADD_CARD = 18
 
 // Сообщения
 // ASK MESSAGES
@@ -139,7 +139,7 @@ function winnerCheck (playerScore, dealerScore){
     }
     else {
         console.log(INFO_DRAW)
-        playerBalance =playerBalance + playerBet
+        playerBalance = playerBalance + playerBet
         return
     }
 }
@@ -232,6 +232,7 @@ while (roundstart !== 'no') {
     //Надо закончить раунд и не раздавать карты Диллеру если у Игрока перебор + сброс руки и ставки Игрока на начальные значения
     if (overScore(playerHandScore) == true) {
         resetPlayeerHand(playerHand)
+        resetDealerHand(dealerHand)
         setSettingsToDefault()
         break
     } 
@@ -260,7 +261,7 @@ while (roundstart !== 'no') {
             console.log(`Dealer hand after card adding is ${dealerHand}`)
             console.log(`Dealer hand score after card adding is ${dealerHandScore}`)
             if (dealerHandScore > CMD_BJ_SCORE) {
-            dealerHandScore = acesDealerOverScore(dealerHandScore, dealerHand)
+            dealerHandScore = handValueWithAces(dealerHand)
             }
             //Сразу проверям на перебор
             //сразу проверяем на перебор у Дилера

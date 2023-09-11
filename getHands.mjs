@@ -42,17 +42,21 @@ function getDealerHandForPlaying(times) {
 
 
 
+//Пробуем избежать переписывание значение туза в колоде
+
+
+const deckForChecking = {...deck}
+
 //Функция оценки руки 
 function handValue (handForEvaluatoin) {
-    handForEvaluatoin.forEach(element => {if (element in deck) {
+    handForEvaluatoin.forEach(element => {if (element in deckForChecking) {
         
-        
-        if (deck[element] === undefined){
+        if (deckForChecking[element] === undefined){
     
-            deck[element] = 11 // Я ТУПОЙ ПЕРЕЗАПИСЫВАЮ заначение ТУЗА В КОЛОДЕ ХЗ КАК РЕШИТЬ
+            deckForChecking[element] = 11 
            
         }
-        handScore += deck[element]
+        handScore += deckForChecking[element]
         return handScore
     }
     return handScore
@@ -61,18 +65,20 @@ function handValue (handForEvaluatoin) {
     handScore = 0
     return finalScore
 }
-
 
 //проверка на на тузов при переборе
+//сделаем отдельную колоду для этих тузов
+const deckForCheckingOverScore = {...deck}
+
 function handValueWithAces (handWithAces) {
-    handWithAces.forEach(element => {if (element in deck) {
+    handWithAces.forEach(element => {if (element in deckForCheckingOverScore) {
        
-        if (deck[element] === 11) { //КОСТЫЛЬНЕО РЕШЕНИЕ ДЛЯ РУКИ С ТУЗОМ ИБО ЕГО ЗНАЧЕНИЕ УЖЕ ПЕРЕЗАПИСАНО МНО В ФУНКЦИИ
+        if (deckForCheckingOverScore[element] === undefined){ 
     
-            deck[element] = 1
+            deckForCheckingOverScore[element] = 1
            
         }
-        handScore += deck[element]
+        handScore += deckForCheckingOverScore[element]
         return handScore
     }
     return handScore
@@ -81,7 +87,7 @@ function handValueWithAces (handWithAces) {
     handScore = 0
     return finalScore
 }
-
+ 
 
 
 
