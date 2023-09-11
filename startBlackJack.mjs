@@ -3,6 +3,9 @@ import { getDealerHandForPlaying, getPlayerHandForPlaying, handValue, handValueW
 import {deck} from "./deckForPlaying.mjs"
 import * as readline from 'node:readline/promises';   //This uses the promise-based APIs // Импорт для ввода через консоль
 import { stdin as input, stdout as output } from 'node:process'; // Импорт для ввода через консоль
+import { isNumber } from "node:util";
+import { isNumberObject } from "node:util/types";
+import { countReset } from "node:console";
 
 
 //Неизменяемые переменные
@@ -33,8 +36,10 @@ const INFO_DRAW = "Oops! It's a DRAW! Try again!"
 const INFO_BOTH_HANDS = "Both hands defined"
 const INFO_PLAYER_HAND = "Final player hand is:"
 const INFO_DEALER_HAND = "Final dealer hand is:"
+const INFO_YOU_TRY_ENTER_STRING = 'You try enter STRING! Please enter only numbers!'
+const INFO_YOU_TRY_ENTER_EMPTY_DATA = 'Your try enter NO DATA! Please enter only numbers!'
 const INFO_SEE_YOU = "See you next time! Good luck!"
-
+const INFO_YOUR_BET_MORE_THAN_BALANCE = "Your bet more than your balance! Please enter another one!"
 //COMAN MESSAGES
 const CMD_STARS = "***********************************************"
 
@@ -144,8 +149,23 @@ function winnerCheck (playerScore, dealerScore){
     }
 }
 
+//Проверки ввода
 
-
+function checkEnterString(balance)
+{ if (isNaN(balance) == true){
+    console.log(INFO_YOU_TRY_ENTER_STRING)
+    }
+}
+function checkEnterEmptyData(qstAswr) {
+    if (Boolean(qstAswr) == false){
+    console.log(INFO_YOU_TRY_ENTER_EMPTY_DATA)
+    }
+}
+function checkBetMoreThanBalance(bet,balance){
+    if(bet > balance){
+        console.log(INFO_YOUR_BET_MORE_THAN_BALANCE)
+    }
+}
 // Проверяем ценность рук   
 playerHandScore = handValue(playerHand)
 
@@ -157,23 +177,56 @@ playerHandScore = handValue(playerHand)
 //Начало игры
 while (start !== 'yes') {
     // Проверка баланса для начала - если нет баланса - игрок вводи количество с которым будет играть    
+    
     if (playerBalance === 0 ) {
+    
     const rlBalance = readline.createInterface({ input, output });
     const answerBalance = await rlBalance.question(`${CMD_STARS} \n${ASK_BALANCR}`);
-    rlBalance.close(); 
+    rlBalance.close();
     playerBalance =  Number(answerBalance)
+    checkEnterEmptyData(answerBalance)
+    checkEnterString(playerBalance)
+    
+    while (isNaN(playerBalance) == true || Boolean(answerBalance) == false || playerBalance === 0) {
+        playerBalance = undefined
+        const rlBalance = readline.createInterface({ input, output });
+        const answerBalance = await rlBalance.question(`${CMD_STARS} \n${ASK_BALANCR}`);
+        rlBalance.close();
+        playerBalance = Number(answerBalance)
+        checkEnterEmptyData(answerBalance)
+        checkEnterString(playerBalance)       
+        if (isNaN(playerBalance) == false && Boolean(answerBalance) == true && playerBalance !== 0){
+            break
+        }
+    }   
     console.log(`${CMD_STARS} \n ${INFO_YOUR_BALANCE} ${playerBalance}`)
     }
     
 
  // Начало нового раунда раздачи - смотрим на ставку игрока и спрашиваем какова будет ставка
- // наданные момент нет защиты от НЕГАТИВНГО БАЛАНСА ставка может быть больше БАЛАНСА
 while (roundstart !== 'no') {
     if (playerBet === 0) {
         const rlBet = readline.createInterface({ input, output });
         const answerBet = await rlBet.question(`${CMD_STARS} \n ${ASK_YOUR_BET}`);
         rlBet.close();
         playerBet = Number(answerBet)
+        checkEnterEmptyData(answerBet)
+        checkEnterString(playerBet)
+        checkBetMoreThanBalance(playerBet, playerBalance)
+        while (isNaN(playerBet) == true || Boolean(answerBet) == false || playerBet === 0 || playerBet > playerBalance) {
+            playerBet = undefined
+            const rlBet = readline.createInterface({ input, output });
+            const answerBet = await rlBet.question(`${CMD_STARS} \n ${ASK_YOUR_BET}`);
+            rlBet.close();
+            playerBet = Number(answerBet)
+            checkEnterEmptyData(answerBet)
+            checkEnterString(playerBet)
+            checkBetMoreThanBalance(playerBet, playerBalance)       
+            if (isNaN(playerBet) == false && Boolean(answerBet) == true && playerBet !== 0 && playerBet < playerBalance){
+                break
+            }
+        }   
+
             playerBalance = playerBalance - playerBet
             console.log(`${INFO_YOUR_BALANCE} ${playerBalance}`)
     }
