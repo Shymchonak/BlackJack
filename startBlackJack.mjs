@@ -3,6 +3,7 @@ import { getDealerHandForPlaying, getPlayerHandForPlaying, handValue, handValueW
 import {deck} from "./deckForPlaying.mjs"
 import * as readline from 'node:readline/promises';   //This uses the promise-based APIs // Импорт для ввода через консоль
 import { stdin as input, stdout as output } from 'node:process'; // Импорт для ввода через консоль
+import { isNumber } from "node:util";
 
 
 
@@ -18,7 +19,7 @@ const CMD_HAND_DEALER_SCORE_TO_ADD_CARD = 17
 
 const ASK_BALANCR = 'How much your balance will be? (Enter integer number) \n'
 const ASK_YOUR_BET = 'What is your BET? ( Enter a integer number) \n'
-const ASK_ONE_MORE_CARD = "Are you need one more card? (Print 'yes' if you need one more card, 'No' Dealer turn) \n"
+const ASK_ONE_MORE_CARD = "Are you need one more card? (Print 'yes' if you need one more card, 'no' Dealer turn) \n"
 const ASK_FINISH_ROUND = 'Do you want play new round?(print "yes" for new round, "no" to finish) \n'
 const ASK_FINISH_GAME = 'Finish game?(print "yes" to quite the game) \n'
 
@@ -40,6 +41,8 @@ const INFO_SEE_YOU = "See you next time! Good luck!"
 const INFO_YOUR_BET_MORE_THAN_BALANCE = "Your bet is more than your balance! Please enter another one!"
 const INFO_ENTER_NEGATIVEV_VALUE = "You try enter negative number! Please enter only positive numbers!"
 const INFO_YOU_TRY_ENTER_SPACES = "Your try enter NODATA or ONLY SPACES! Enter only numbers please!"
+const INFO_YOU_TRY_ENTER_NOT_YESNO_ASWER = "You try enter something not valid! Please enter only YES/NO"
+
 //COMAN MESSAGES
 const CMD_STARS = "***********************************************"
 
@@ -66,7 +69,7 @@ let playerBet = new MutableVariables().value
 let answerCard = new MutableVariables().undefined
 let playerHand =new MutableVariables().array
 let dealerHand =new MutableVariables().array
-let start = new MutableVariables().booleantrue
+let startGame = new MutableVariables().booleantrue
 
 
 
@@ -147,7 +150,7 @@ function winnerCheck (playerScore, dealerScore){
 
 //Проверки ввода
 
-function checkEnterString(enteredValue)
+function checkBalanceBetEnterString(enteredValue)
 { if (isNaN(enteredValue) == true ){
     console.log(INFO_YOU_TRY_ENTER_STRING)
     }
@@ -159,7 +162,6 @@ function checkEnterSpaces(enteredSpace) {
         }
 }
 
-
 function checkBetMoreThanBalance(bet,balance){
     if(bet > balance){
         console.log(INFO_YOUR_BET_MORE_THAN_BALANCE)
@@ -170,6 +172,16 @@ function checkNegativeNumber(number){
         console.log(INFO_ENTER_NEGATIVEV_VALUE)
     }
 }
+
+
+function checkEnterForYesNoAnswer(answerYesNo) {
+    if (answerYesNo.trim() === '' || !isNaN(answerYesNo) == true){
+        console.log(INFO_YOU_TRY_ENTER_NOT_YESNO_ASWER)
+        return true
+        }
+}
+
+
 // Проверяем ценность рук   
 playerHandScore = handValue(playerHand)
 
@@ -179,7 +191,7 @@ playerHandScore = handValue(playerHand)
 
 
 //Начало игры
-while (start !== 'yes') {
+while (startGame !== 'yes') {
     // Проверка баланса для начала - если нет баланса - игрок вводи количество с которым будет играть    
     
     if (playerBalance === 0 ) {
@@ -189,7 +201,7 @@ while (start !== 'yes') {
     rlBalance.close();
     playerBalance =  Number(answerBalance)
     checkEnterSpaces(answerBalance)
-    checkEnterString(playerBalance)
+    checkBalanceBetEnterString(playerBalance)
     checkNegativeNumber(playerBalance)
     while (isNaN(playerBalance) == true || Boolean(answerBalance) == false || playerBalance <= 0) {
         playerBalance = undefined
@@ -198,7 +210,7 @@ while (start !== 'yes') {
         rlBalance.close();
         playerBalance = Number(answerBalance)
         checkEnterSpaces(answerBalance)
-        checkEnterString(playerBalance)
+        checkBalanceBetEnterString(playerBalance)
         checkNegativeNumber(playerBalance)       
         if (isNaN(playerBalance) == false && Boolean(answerBalance) == true && playerBalance !== 0 && playerBalance > 0){
             break
@@ -217,7 +229,7 @@ while (roundstart !== 'no') {
         playerBet = Number(answerBet)
   //      checkEnterEmptyData(answerBet)
         checkEnterSpaces(answerBet)
-        checkEnterString(playerBet)
+        checkBalanceBetEnterString(playerBet)
         checkNegativeNumber(playerBet)
         checkBetMoreThanBalance(playerBet, playerBalance)
         while (isNaN(playerBet) == true || Boolean(answerBet) == false || playerBet <= 0 || playerBet > playerBalance) {
@@ -227,7 +239,7 @@ while (roundstart !== 'no') {
             rlBet.close();
             playerBet = Number(answerBet)
             checkEnterSpaces(answerBet)
-            checkEnterString(playerBet)
+            checkBalanceBetEnterString(playerBet)
             checkNegativeNumber(playerBet)
             checkBetMoreThanBalance(playerBet, playerBalance)       
             if (isNaN(playerBet) == false && Boolean(answerBet) == true && playerBet !== 0 && playerBet <= playerBalance && playerBet > 0){
@@ -273,6 +285,8 @@ while (roundstart !== 'no') {
             const rlCardAsk = readline.createInterface({ input, output });
             const answerCard = await rlCardAsk.question(`${CMD_STARS} \n${ASK_ONE_MORE_CARD}`);
             rlCardAsk.close();
+            //Проверки ввода
+            checkEnterForYesNoAnswer(answerCard)
             if (answerCard === 'yes') {
                 playerHand = getPlayerHandForPlaying(CMD_GIVE_ONE_CARD)
                 playerHandScore = handValue(playerHand)
@@ -289,9 +303,22 @@ while (roundstart !== 'no') {
             //Сразу проверям на перебор
             if (overScore(playerHandScore) == true) {
                     console.log (INFO_PLAYER_LOSE_BET)
+                    
                     const rlRound = readline.createInterface({ input, output });
                     const answerRound = await rlRound.question(ASK_FINISH_ROUND);
                     rlRound.close();
+                    //Проверка ввода
+                    if (checkEnterForYesNoAnswer(answerRound) == true) {
+                        while (answerRound !== 'yes' || answerRound !== 'no'){
+                        const rlRound = readline.createInterface({ input, output });
+                        const answerRound = await rlRound.question(ASK_FINISH_ROUND);
+                        rlRound.close();
+                        checkEnterForYesNoAnswer(answerRound)
+                        if (answerRound === 'yes' || answerRound === 'no'){
+                            break
+                        }
+                        }
+                    }
                     roundstart = answerRound
                     break   
             } 
@@ -322,6 +349,18 @@ while (roundstart !== 'no') {
             const rlRound = readline.createInterface({ input, output });
             const answerRound = await rlRound.question(ASK_FINISH_ROUND);
             rlRound.close();
+            //Проверка ввода
+            if (checkEnterForYesNoAnswer(answerRound) == true) {
+                while (answerRound !== 'yes' || answerRound !== 'no'){
+                const rlRound = readline.createInterface({ input, output });
+                const answerRound = await rlRound.question(ASK_FINISH_ROUND);
+                rlRound.close();
+                checkEnterForYesNoAnswer(answerRound)
+                if (answerRound === 'yes' || answerRound === 'no'){
+                    break
+                }
+                }
+            }
             roundstart = answerRound
             continue 
         }
@@ -352,6 +391,18 @@ while (roundstart !== 'no') {
             const rlRound = readline.createInterface({ input, output });
             const answerRound = await rlRound.question(ASK_FINISH_ROUND);
             rlRound.close();
+            //Проверка ввода
+            if (checkEnterForYesNoAnswer(answerRound) == true) {
+                while (answerRound !== 'yes' || answerRound !== 'no'){
+                const rlRound = readline.createInterface({ input, output });
+                const answerRound = await rlRound.question(ASK_FINISH_ROUND);
+                rlRound.close();
+                checkEnterForYesNoAnswer(answerRound)
+                if (answerRound === 'yes' || answerRound === 'no'){
+                    break
+                }
+                }
+            }
             roundstart = answerRound 
             continue
         }    
@@ -378,17 +429,42 @@ while (roundstart !== 'no') {
 const rlRound = readline.createInterface({ input, output });
 const answerRound = await rlRound.question(ASK_FINISH_ROUND);
     rlRound.close();
+    //Проверка ввода
+    if (checkEnterForYesNoAnswer(answerRound) == true) {
+        while (answerRound !== 'yes' || answerRound !== 'no'){
+        const rlRound = readline.createInterface({ input, output });
+        const answerRound = await rlRound.question(ASK_FINISH_ROUND);
+        rlRound.close();
+        checkEnterForYesNoAnswer(answerRound)
+        if (answerRound === 'yes' || answerRound === 'no'){
+            break
+        }
+        }
+    }
     roundstart = answerRound
 
-} 
+}
 
 const rlGame = readline.createInterface({ input, output });
 const answerGame = await rlGame.question(ASK_FINISH_GAME);
     rlGame.close();
-    gamestart =  answerGame
-    if (gamestart === 'yes') {
+    //Проверка ввода
+    if (checkEnterForYesNoAnswer(answerGame) == true) {
+        while (answerGame !== 'yes' || answerGame !== 'no'){
+        const rlGame = readline.createInterface({ input, output });
+        const answerGame = await rlGame.question(ASK_FINISH_GAME);
+            rlGame.close();
+        checkEnterForYesNoAnswer(answerGame)
+        if (answerGame === 'yes' || answerGame === 'no'){
+            break
+        }
+        }
+    }
+    startGame =  answerGame
+    if (startGame === 'yes') {
         console.log(INFO_SEE_YOU)
-       break}    
+       break}
+ 
 
 }
 
