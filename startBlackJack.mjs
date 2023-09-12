@@ -444,6 +444,7 @@ const answerRound = await rlRound.question(ASK_FINISH_ROUND);
     roundstart = answerRound
     continue
 }
+//Присваиваем ответу на выход из раунда другое значение, что бы можно было вернуться в рануд, если игрок не захочет выходить из Игры
 roundstart = true
 const rlGame = readline.createInterface({ input, output });
 const answerGame = await rlGame.question(ASK_FINISH_GAME);
