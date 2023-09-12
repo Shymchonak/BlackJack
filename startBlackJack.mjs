@@ -409,7 +409,7 @@ while (roundstart !== 'no') {
         console.log(CMD_STARS)
         console.log(`${INFO_BOTH_HANDS}`)
         console.log(`${INFO_PLAYER_HAND} ${playerHand} and score of it: ${playerHandScore}`)
-        console.log(`${INFO_DEALER_HAND} ${dealerHand} adn score of it: ${dealerHandScore}`)
+        console.log(`${INFO_DEALER_HAND} ${dealerHand} and score of it: ${dealerHandScore}`)
         console.log(CMD_STARS)
         //Если не было ни у кого БЛЭКДЖЕКА и ПЕРЕБОРА проверяем кто выиграл
 
@@ -442,9 +442,9 @@ const answerRound = await rlRound.question(ASK_FINISH_ROUND);
         }
     }
     roundstart = answerRound
-
+    continue
 }
-
+roundstart = true
 const rlGame = readline.createInterface({ input, output });
 const answerGame = await rlGame.question(ASK_FINISH_GAME);
     rlGame.close();
@@ -453,30 +453,23 @@ const answerGame = await rlGame.question(ASK_FINISH_GAME);
         while (answerGame !== 'yes' || answerGame !== 'no'){
         const rlGame = readline.createInterface({ input, output });
         const answerGame = await rlGame.question(ASK_FINISH_GAME);
-            rlGame.close();
+        rlGame.close();
         checkEnterForYesNoAnswer(answerGame)
         if (answerGame === 'yes' || answerGame === 'no'){
             break
         }
         }
+        
     }
     startGame =  answerGame
     if (startGame === 'yes') {
         console.log(INFO_SEE_YOU)
        break}
- 
+    if (startGame === 'no'){
+        continue
+    }
 
-}
-
-
-
-
-
-
-
-
-
-
+} 
 
 
 
